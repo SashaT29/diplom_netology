@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let dayToday = document.querySelector('.page-nav__day_today')
+  let dayToday = document.querySelector('.page-nav__day_today');
   let dayWeek = document.querySelectorAll('.page-nav__day-week');
   let dayNumber = document.querySelectorAll('.page-nav__day-number');
   let navDay = document.querySelectorAll('.page-nav__day');
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let element of seancesTime) {
             element.addEventListener('click', () => {
                 let hallId = element.dataset.hallId;
-                let chosenHall = halls.find((hall) => hall.hall_id === hallId);
+                let chosenHall = halls.find((hall) => hall.hall_id == hallId);
                 let chosenData = {
                     ...element.dataset,
                     hallConfig: chosenHall.hall_config

@@ -21,5 +21,5 @@ function createRequest (body, callback) {
 
     .catch((err) => {
         console.log(err);
-    })
+    });
 }

@@ -1,38 +1,38 @@
-let parsedSession = JSON.parse(localStorage.getItem('session'));
+let parsedSeances = JSON.parse(localStorage.getItem('session'));
 let confStepWrapper = document.querySelector('.conf-step__wrapper');
 let button = document.querySelector('.acceptin-button');
 
-let filmsTitle = document.querySelector('.buying__info-title');
-filmsTitle.textContent = parsedSession.filmName;
+let filmTitle = document.querySelector('.buying__info-title');
+filmTitle.textContent = parsedSeances.filmName;
 
-let seanceStart = document.querySelector('.buying__info-start');
-seanceStart.textContent = `Начало сеанса: ${parsedSession.seanceTime}`;
+let startSeance = document.querySelector('.buying__info-start');
+startSeance.textContent = `Начало сеанса: ${parsedSeances.seanceTime}`;
 
-let hallInfo = document.querySelector('.buying__info-hall');
-hallInfo.textContent = parsedSession.hallName.split('Зал').join('Зал ');
+let infoHall = document.querySelector('.buying__info-hall');
+infoHall.textContent = parsedSeances.hallName.split('Зал').join('Зал ');
 
 let priceStd = document.querySelector('.price-standart');
-priceStd.textContent = parsedSession.priceStandart;
+priceStd.textContent = parsedSeances.priceStandart;
 
 let priceVip = document.querySelector('.price-vip');
-priceVip.textContent = parsedSession.priceVip;
+priceVip.textContent = parsedSeances.priceVip;
 
-let buy = document.querySelector('.buying');
+let scale = document.querySelector('.buying');
 
 let hint = document.querySelector('.buying__info-hint');
 hint.addEventListener('dblclick', () => {
-    buy.classList.toggle('buying-scale');
+    scale.classList.toggle('buying-scale');
 })
 
-createRequest(`event=get_hallConfig&timestamp=${parsedSession.timeStamp}&hallId=${parsedSession.hallId}&seanceId=${parsedSession.seanceId}`, function (data) {
+createRequest(`event=get_hallConfig&timestamp=${parsedSeances.timeStamp}&hallId=${parsedSeances.hallId}&seanceId=${parsedSeances.seanceId}`, function (data) {
     if (data) {
         document.querySelector('.conf-step__wrapper').innerHTML = data;
     } else {
-        document.querySelector('.conf-step__wrapper').innerHTML = parsedSession.hallConfig;
+        document.querySelector('.conf-step__wrapper').innerHTML = parsedSeances.hallConfig;
     }
 
-    let selectChair = document.querySelectorAll('.conf-step__row .conf-step__chair_selected');
-    if (selectChair.length > 0) {
+    let chairSelected = document.querySelectorAll('.conf-step__row .conf-step__chair_selected');
+    if (chairSelected.length > 0) {
         button.disabled = false;
     } else {
         button.disabled = true;
@@ -47,9 +47,9 @@ createRequest(`event=get_hallConfig&timestamp=${parsedSession.timeStamp}&hallId=
                 chair.classList.remove('conf-step__chair_selected');
             }
 
-            selectChair = document.querySelectorAll('.conf-step__row .conf-step__chair_selected');
+            chairSelected = document.querySelectorAll('.conf-step__row .conf-step__chair_selected');
 
-            if (selectChair.length > 0){
+            if (chairSelected.length > 0){
                 button.disabled = false;
             } else {
                 button.disabled = true;
@@ -58,23 +58,23 @@ createRequest(`event=get_hallConfig&timestamp=${parsedSession.timeStamp}&hallId=
     }
 
     button.addEventListener('click', () => {
-        let chairsSelected = [];
-        selectChair.forEach((selectedChair) => {
+        let selectedChairs = [];
+        chairSelected.forEach((selectedChair) => {
             let rowElement = selectedChair.closest('.conf-step__row');
             let rowIndex = Array.from(rowElement.parentNode.children).indexOf(rowElement) + 1;
             let placeIndex = Array.from(rowElement.children).indexOf(selectedChair) + 1;
 
-            let placeType;
+            let typePlace;
             if (selectedChair.classList.contains('conf-step__chair_standart')) {
-                placeType = 'standart';
+                typePlace = 'standart';
             } else if (selectedChair.classList.contains('conf-step__chair_vip')) {
-                placeType = 'vip';
+                typePlace = 'vip';
             }
-                chairsSelected.push({ row: rowIndex, place: placeIndex, type: placeType});
+                selectedChairs.push({ row: rowIndex, place: placeIndex, type: typePlace});
 
-            parsedSession.hallConfig = confStepWrapper.innerHTML;
-            parsedSession.selectedPlace = chairsSelected;
-            localStorage.setItem('session', JSON.stringify(parsedSession));
+            parsedSeances.hallConfig = confStepWrapper.innerHTML;
+            parsedSeances.selectedPlaces = selectedChairs;
+            localStorage.setItem('session', JSON.stringify(parsedSeances));
             location.href = 'payment.html';
         })
     })

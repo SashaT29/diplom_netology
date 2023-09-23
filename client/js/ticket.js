@@ -1,35 +1,45 @@
 function qrCode () {
-    let parsedSession = JSON.parse(localStorage.getItem('session'));
+    let parsedSeances = JSON.parse(localStorage.getItem('session'));
+
+    fetch('https://jscp-diplom.netoserver.ru/', {
+        method: 'POST',
+        body: `event=sale_add&timestamp=${parsedSeances.timeStamp
+    }&hallId=${parsedSeances.hallId}&seanceId=${parsedSeances.seanceId}&hallConfiguration=${parsedSeances.hallConfig}`,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
 
     let filmTitle = document.querySelector('.ticket__title');
-    filmTitle.textContent = parsedSession.filmName;
+    filmTitle.textContent = parsedSeances.filmName;
 
-    let seanceStart = document.querySelector('.ticket__start');
-    let bookedDay = new Date(parsedSession.timeStamp*1000);
+    let startSeance = document.querySelector('.ticket__start');
+    let bookedDay = new Date(parsedSeances.timeStamp*1000);
     let bookedDate = bookedDay.toLocaleString().split(',')[0];
 
-    seanceStart.textContent = `${parsedSession.seanceTime}, ${bookedDate}`;
-    let hallInfo = document.querySelector('.ticket__hall');
-    hallInfo.textContent = parsedSession.hallName.split('Зал').join('');
+    startSeance.textContent = `${parsedSeances.seanceTime}, ${bookedDate}`;
+
+    let infoHall = document.querySelector('.ticket__hall');
+    infoHall.textContent = parsedSeances.hallName.split('Зал').join('');
 
     let ticketChair = document.querySelector('.ticket__chairs');
     let text = '';
     let type = '';
 
-    for (let key in parsedSession.selectedPlace) {
-        let row = parsedSession.selectedPlace[key].row;
-        let place = parsedSession.selectedPlace[key].place;
-        type = parsedSession.selectedPlace[key].place;
+    for (let key in parsedSeances.selectedPlaces) {
+        let row = parsedSeances.selectedPlaces[key].row;
+        let place = parsedSeances.selectedPlaces[key].place;
+        type = parsedSeances.selectedPlaces[key].type;
         text += `${row}/${place},`;
     }
 
     ticketChair.textContent = text.slice(0, -1);
 
-    let qrContent = `
-    Фильм: '${parsedSession.filmName}'.
+    let contentQr = `
+    Фильм: '${parsedSeances.filmName}'.
     Ряд/место: ${text.slice(0, -1)}.
-    Зал: ${parsedSession.hallName.split('Зал').join('')}.
-    Начало сеанса: ${parsedSession.seanceTime}.
+    Зал: ${parsedSeances.hallName.split('Зал').join('')}.
+    Начало сеанса: ${parsedSeances.seanceTime}.
     Дата сеанса: ${bookedDate}.
     
     Билет действителен строго на свой сеанс. 
@@ -37,8 +47,8 @@ function qrCode () {
 
     document.querySelector('.ticket__info-qr').outerHTML = '<div class="ticket__info-qr"></div>';
 
-    let genQr = QRCreator(qrContent, {image: "SVG"});
-    document.querySelector('.ticket__info-qr').append(genQr.result);
+    let qrCode = QRCreator(contentQr, {image: "SVG"});
+    document.querySelector('.ticket__info-qr').append(qrCode.result);
 }
 
 document.addEventListener('DOMContentLoaded', qrCode);
